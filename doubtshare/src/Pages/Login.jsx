@@ -33,6 +33,7 @@ function Login() {
     .then((res)=>res.json())
     .then((res)=>{
       localStorage.setItem("token", res.token)
+      localStorage.setItem("userId", res.userId)
       if (res.msg === "login success") {
         toast({
           title: "Login Success.",
@@ -42,12 +43,9 @@ function Login() {
           duration: 3000,
           isClosable: true,
         });
-        if(formData.role=="student"){
-          navigate("/home/student")
+        
+          navigate("/home")
 
-        }else if(formData.role=="tutor"){
-          navigate("/home/tutors")
-        }
       } else {
         toast({
           title: "Login Failed.",

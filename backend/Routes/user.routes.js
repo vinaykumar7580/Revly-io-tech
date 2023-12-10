@@ -32,7 +32,7 @@ userRouter.post("/login", async (req, res) => {
             bcrypt.compare(password, user.password, async(err, result)=> {
                 if(result){
                     let token = jwt.sign({ userID:user._id}, 'vinay');
-                    res.status(200).send({msg:"login success", token})
+                    res.status(200).send({msg:"login success", token, role:user.role, userId:user._id})
                 }else{
                     res.status(500).send({msg:"login failed"})
                 }
@@ -45,13 +45,15 @@ userRouter.post("/login", async (req, res) => {
     }
 });
 
-userRouter.get("/user", async (req, res) => {
+userRouter.get("/user/:id", async (req, res) => {
     const token=req.headers.authorization;
     const decoded=jwt.verify(token, 'vinay')
+    const {id}=req.params;
     try{
-     
-        let user=await User.findOne({_id:decoded.userID})
+      if(decoded){
+        let user=await User.findOne({_id:id})
         res.status(200).send(user)
+      } 
 
     }catch(err){
         res.status(500).send("please login first");

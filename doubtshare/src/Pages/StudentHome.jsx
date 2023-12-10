@@ -1,19 +1,63 @@
 import style from "../Styles/student.module.css";
 import starimage from "../Components/picture2.jpg";
-import { useEffect, useState } from "react";
-import io from 'socket.io-client';
-
-const socket = io('http://localhost:8080');
+import { useEffect, useRef, useState } from "react";
+import io from "socket.io-client";
+import {
+  Button,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+} from "@chakra-ui/react";
 
 function StudentHome() {
+  const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState({});
+  const [activeUser, setActiveUser] = useState([]);
+
+  const socket = useRef();
+  socket.current = io("http://localhost:8080");
+
+  const onOpen = (sub) => {
+    setIsOpen(true);
+    console.log("sub", sub)
+    if(user?.role=="student"){
+      let payload={
+        name:user?.name,
+        subject:sub,
+        class:user?.classgrade
+      }
+      //send
+      socket.current.emit("send-notification", payload);
+
+
+    }else if(user?.role=="tutor"){
+      let res=user?.subject.some((task) => task === sub)
+      if(res){
+        //receive
+        socket.current.on("recieve-notification", (data)=>{
+          if(data.class===user?.classgrade){
+            alert(`${data.name} ask doubt of ${data.subject} subject.`)
+
+          }
+        })
+      }
+    }
+  };
+  const onClose = () => {
+    setIsOpen(false);
+  };
 
   useEffect(() => {
     handleUser();
   }, []);
 
   const handleUser = () => {
-    fetch("http://localhost:8080/auth/user", {
+    let id=localStorage.getItem("userId")
+    fetch(`http://localhost:8080/auth/user/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -29,11 +73,15 @@ function StudentHome() {
       });
   };
 
- 
-
-
+  useEffect(() => {
+    socket.current.emit("new-user-joined", user._id);
+    socket.current.on("get-users", (users) => {
+      setActiveUser(users);
+    });
+  }, [user]);
 
   console.log("user", user);
+  console.log("activeUser", ...activeUser);
   return (
     <div className={style.studenthome}>
       <div className={style.navbar}>
@@ -71,7 +119,9 @@ function StudentHome() {
           <div className={style.poster_second_box} style={{ width: "30%" }}>
             <div style={{ textAlign: "left" }}>
               <div>
-                <h1>Student Details</h1>
+                <h1 className={style.firstname}>
+                  {user && user?.role} details
+                </h1>
                 <h3>Name: {user && user?.name}</h3>
                 <h3>Email: {user && user?.email}</h3>
                 <h3>Class grade: {user && user?.classgrade}</h3>
@@ -97,11 +147,29 @@ function StudentHome() {
                   />
                 </div>
                 <div>
-                  <h3>Class {user && user?.classgrade}</h3>
+                  <h3 className={style.firstname}>{el}</h3>
                   <h4>
-                    Comprehensive learning program of subject {el} for class {user && user?.classgrade} standard preparation.
+                    Comprehensive learning program of subject {el} for class{" "}
+                    {user && user?.classgrade} standard preparation.
                   </h4>
-                  <button>Ask Doubt</button>
+                  <button onClick={()=>onOpen(el)}>{user?.role=="student"?"Ask Doubt":"Check Doubt"}</button>
+                  <Modal isOpen={isOpen} onClose={onClose}>
+                    <ModalOverlay />
+                    <ModalContent>
+                      <ModalHeader>Popup Title</ModalHeader>
+                      <ModalCloseButton />
+                      <ModalBody>
+                        
+                        <p>This is the content of the popup.</p>
+                      </ModalBody>
+                      <ModalFooter>
+                        <Button colorScheme="blue" mr={3} onClick={onClose}>
+                          Close
+                        </Button>
+                        {/* Additional buttons or actions */}
+                      </ModalFooter>
+                    </ModalContent>
+                  </Modal>
                   <button style={{ marginLeft: "10px" }}>History</button>
                 </div>
               </div>
