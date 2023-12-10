@@ -8,7 +8,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0px 80px;
+  padding: 10px 80px;
   background-color: #813588;
   color: white;
   box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
@@ -16,7 +16,7 @@
 
 .navbar > div:first-child > h1 {
   font-family: serif;
-  font-size: 35px;
+  font-size: 40px;
 }
 
 .navbar_second_child {
@@ -26,6 +26,7 @@
   gap: 30px;
   font-size: 18px;
   font-family: sans-serif;
+  color: #ffc846;
 }
 
 a {
@@ -58,11 +59,17 @@ a {
     background-color: white;
     padding:30px;
     border-radius: 10px;
+    font-weight: bold;
 }
 .poster_second_box h1{
     font-family: serif;
     color: #8c3fff;
-    font-size: 35px;
+    font-size: 30px;
+}
+.poster_second_box h3{
+   line-height: 35px;
+    color:black;
+    font-size: 20px;
 }
 img{
     width: 100%;
@@ -70,7 +77,7 @@ img{
 }
 
 .section{
-    margin-top: 50px;
+    margin-top: 40px;
     
 }
 
@@ -78,6 +85,7 @@ img{
     font-family: serif;
     font-weight: bold;
     font-size: 30px;
+    margin-bottom: 20px;
 }
 
 .sessions{
@@ -95,6 +103,7 @@ img{
     gap:30px;
     padding: 20px;
     border-radius: 10px;
+    margin-top: 20px;
     box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px;
 }
 
@@ -102,12 +111,15 @@ img{
     background: linear-gradient(to right,#5c72ff,#8c3fff);
     color: white;
     padding: 10px 0px;
+    font-weight: bold;
 }
 
 .sessions_box h4{
    color: #8c3fff;
    font-family: sans-serif;
    font-size: 20px;
+   margin-top: 10px;
+   
    
 }
 
@@ -146,8 +158,11 @@ img{
     background: linear-gradient(to right,#5c72ff,#8c3fff);
     color: white;
     padding: 10px 10px;
+    font-weight: bold;
+    font-size: 18px;
 }
 
 .singlechild h4{
-    font-size: 18px;
+    margin: 10px 0px;
+    font-size: 16px;
 }

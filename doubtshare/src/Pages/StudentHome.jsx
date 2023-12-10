@@ -1,7 +1,39 @@
 import style from "../Styles/student.module.css";
 import starimage from "../Components/picture2.jpg";
+import { useEffect, useState } from "react";
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:8080');
 
 function StudentHome() {
+  const [user, setUser] = useState({});
+
+  useEffect(() => {
+    handleUser();
+  }, []);
+
+  const handleUser = () => {
+    fetch("http://localhost:8080/auth/user", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `${localStorage.getItem("token")}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setUser(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+ 
+
+
+
+  console.log("user", user);
   return (
     <div className={style.studenthome}>
       <div className={style.navbar}>
@@ -36,19 +68,18 @@ function StudentHome() {
               alt="first"
             />
           </div>
-          <div className={style.poster_second_box} style={{ width: "20%" }}>
-            <div style={{textAlign:"left"}}>
-                <div >
+          <div className={style.poster_second_box} style={{ width: "30%" }}>
+            <div style={{ textAlign: "left" }}>
+              <div>
                 <h1>Student Details</h1>
-                <h3>Name: Vinay Hatwar</h3>
-                <h3>Email: vinay@gmail.com</h3>
-                <h3>Class grade: 12th</h3>
-                <h3>Subject: Physics</h3>
-                <h3>Language: Marathi</h3>
+                <h3>Name: {user && user?.name}</h3>
+                <h3>Email: {user && user?.email}</h3>
+                <h3>Class grade: {user && user?.classgrade}</h3>
+                <h3>Subject: </h3>
+                {user && user?.subject?.map((el) => <span>{el}, </span>)}
+                <h3>Language: {user && user?.language}</h3>
+              </div>
             </div>
-            </div>
-            
-            
           </div>
         </div>
       </div>
@@ -56,51 +87,28 @@ function StudentHome() {
       <div className={style.section}>
         <h1>Ongoing Sessions</h1>
         <div className={style.sessions}>
-          <div className={style.sessions_box}>
-            <div>
-              <img
-                src="https://cdn.pixabay.com/photo/2019/02/10/09/21/lecture-3986809_640.jpg"
-                alt="sessionsimages"
-              />
-            </div>
-            <div>
-              <h3>Class 12th</h3>
-              <h4>Comprehensive learning program for class 12th preparation</h4>
-              <button>Ask Doubt</button>
-            </div>
-          </div>
-          <br />
-          <div className={style.sessions_box}>
-            <div>
-              <img
-                src="https://cdn.pixabay.com/photo/2019/02/10/09/21/lecture-3986809_640.jpg"
-                alt="sessionsimages"
-              />
-            </div>
-            <div>
-              <h3>Class 12th</h3>
-              <h4>Comprehensive learning program for class 12th preparation</h4>
-              <button>Ask Doubt</button>
-            </div>
-          </div>
-          <br />
-          <div className={style.sessions_box}>
-            <div>
-              <img
-                src="https://cdn.pixabay.com/photo/2019/02/10/09/21/lecture-3986809_640.jpg"
-                alt="sessionsimages"
-              />
-            </div>
-            <div>
-              <h3>Class 12th</h3>
-              <h4>Comprehensive learning program for class 12th preparation</h4>
-              <button>Ask Doubt</button>
-            </div>
-          </div>
+          {user &&
+            user?.subject?.map((el) => (
+              <div className={style.sessions_box} key={el}>
+                <div>
+                  <img
+                    src="https://cdn.pixabay.com/photo/2019/02/10/09/21/lecture-3986809_640.jpg"
+                    alt="sessionsimages"
+                  />
+                </div>
+                <div>
+                  <h3>Class {user && user?.classgrade}</h3>
+                  <h4>
+                    Comprehensive learning program of subject {el} for class {user && user?.classgrade} standard preparation.
+                  </h4>
+                  <button>Ask Doubt</button>
+                  <button style={{ marginLeft: "10px" }}>History</button>
+                </div>
+              </div>
+            ))}
         </div>
       </div>
 
-    
       <div className={style.section}>
         <h1>Get the DoubtShare advantage</h1>
         <div className={style.singlebox}>

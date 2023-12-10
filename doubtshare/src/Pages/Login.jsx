@@ -1,15 +1,19 @@
 import style from "../Styles/register.module.css";
 import star from "../Components/picture1.jpg";
 import starvertical from "../Components/picture4.jpg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useToast } from "@chakra-ui/react";
 
 function Login() {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
-    role:"student"
+    role: "student",
   });
+
+  const toast = useToast();
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,16 +23,64 @@ function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    console.log("data", formData);
+    fetch("http://localhost:8080/auth/login",{
+      method:"POST",
+      body:JSON.stringify(formData),
+      headers:{
+        "Content-Type":"application/json"
+      }
+    })
+    .then((res)=>res.json())
+    .then((res)=>{
+      localStorage.setItem("token", res.token)
+      if (res.msg === "login success") {
+        toast({
+          title: "Login Success.",
+          description: "You are login the app.",
+          status: "success",
+          position: "top",
+          duration: 3000,
+          isClosable: true,
+        });
+        if(formData.role=="student"){
+          navigate("/home/student")
+
+        }else if(formData.role=="tutor"){
+          navigate("/home/tutors")
+        }
+      } else {
+        toast({
+          title: "Login Failed.",
+          description: "Something went wrong.",
+          status: "error",
+          position: "top",
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+      
+    })
+    .catch((err)=>{
+        console.log(err)
+        toast({
+          title: "Login Failed.",
+          description: "Something went wrong.",
+          status: "error",
+          position: "top",
+          duration: 3000,
+          isClosable: true,
+        });
+      
+    })
 
     setFormData({
       email: "",
       password: "",
-      role:"student"
+      role: "student",
     });
   };
 
-  const { email, password, role} = formData;
+  const { email, password, role } = formData;
 
   return (
     <div className={style.register}>
@@ -36,38 +88,44 @@ function Login() {
         <img src={star} alt="star" />
       </div>
 
-      <div className={style.main}>
+      <div className={style.mainlogin}>
         <h1>Login</h1>
         <div>
           <form className={style.form} onSubmit={handleSubmit}>
-            <label>Email</label>
-            <input
-              type="text"
-              placeholder="Enter email"
-              name="email"
-              value={email}
-              onChange={handleChange}
-              required
-            />
+            <div className={style.form_login_box}>
+              <label>Email</label>
+              <input
+                type="text"
+                placeholder="Enter email"
+                name="email"
+                value={email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className={style.form_login_box}>
+              <label>Password</label>
+              <input
+                type="password"
+                placeholder="Enter password"
+                name="password"
+                value={password}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-            <label>Password</label>
-            <input
-              type="password"
-              placeholder="Enter password"
-              name="password"
-              value={password}
-              onChange={handleChange}
-              required
-            />
-
-            <label>Role</label>
-            <br />
-            <select name="role" value={role} onChange={handleChange}>
-              <option value="student">Student</option>
-              <option value="tutor">Tutor</option>
-            </select>
-
-            <button type="submit">Submit</button>
+            <div className={style.form_login_box}>
+              <label>Role</label>
+              <br />
+              <select name="role" value={role} onChange={handleChange}>
+                <option value="student">Student</option>
+                <option value="tutor">Tutor</option>
+              </select>
+            </div>
+            <div className={style.button}>
+              <button type="submit">Submit</button>
+            </div>
           </form>
           <br />
           <p>
