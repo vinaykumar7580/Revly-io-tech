@@ -2,51 +2,35 @@ import style from "../Styles/student.module.css";
 import starimage from "../Components/picture2.jpg";
 import { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
-import {
-  Button,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-} from "@chakra-ui/react";
+
+import DoubtModel from "../Components/DoubtModel";
 
 function StudentHome() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState({});
   const [activeUser, setActiveUser] = useState([]);
+  const [subject, setSubject] = useState(null);
+  const [sendMessage, setSendMessage]=useState(null)
+  const [receiveMessage, setReceiveMessage]=useState(null)
+  const [allUser, setAllUser]=useState([])
 
   const socket = useRef();
   socket.current = io("http://localhost:8080");
 
   const onOpen = (sub) => {
     setIsOpen(true);
-    console.log("sub", sub)
-    if(user?.role=="student"){
-      let payload={
-        name:user?.name,
-        subject:sub,
-        class:user?.classgrade
-      }
+    console.log("sub", sub);
+    setSubject(sub);
+    if (user?.role == "student") {
+      let payload = {
+        name: user?.name,
+        subject: sub,
+      };
       //send
       socket.current.emit("send-notification", payload);
-
-
-    }else if(user?.role=="tutor"){
-      let res=user?.subject.some((task) => task === sub)
-      if(res){
-        //receive
-        socket.current.on("recieve-notification", (data)=>{
-          if(data.class===user?.classgrade){
-            alert(`${data.name} ask doubt of ${data.subject} subject.`)
-
-          }
-        })
-      }
     }
   };
+
   const onClose = () => {
     setIsOpen(false);
   };
@@ -55,8 +39,9 @@ function StudentHome() {
     handleUser();
   }, []);
 
+  
   const handleUser = () => {
-    let id=localStorage.getItem("userId")
+    let id = localStorage.getItem("userId");
     fetch(`http://localhost:8080/auth/user/${id}`, {
       method: "GET",
       headers: {
@@ -80,8 +65,37 @@ function StudentHome() {
     });
   }, [user]);
 
+  useEffect(() => {
+    if (subject) {
+      if (user?.role == "tutor") {
+        socket.current.on("recieve-notification", (data) => {
+          alert(`${data.name} ask doubt of ${data.subject} subject.`);
+        });
+      }
+    }
+  }, [subject]);
+
+  // send Message to socket
+  useEffect(()=>{
+    //const newUser=activeUser.find((some)=>some.userId!= user._id)
+  
+    if(sendMessage != null){
+    
+       socket.current.emit("send-message", sendMessage)
+    }
+
+  },[sendMessage])
+
+  //receive Message from socket
+  useEffect(()=>{
+    socket.current.on("receive-message", (data)=>{
+      setReceiveMessage(data)
+    })
+
+  },[receiveMessage])
+
   console.log("user", user);
-  console.log("activeUser", ...activeUser);
+  console.log("activeUser", allUser);
   return (
     <div className={style.studenthome}>
       <div className={style.navbar}>
@@ -152,25 +166,17 @@ function StudentHome() {
                     Comprehensive learning program of subject {el} for class{" "}
                     {user && user?.classgrade} standard preparation.
                   </h4>
-                  <button onClick={()=>onOpen(el)}>{user?.role=="student"?"Ask Doubt":"Check Doubt"}</button>
-                  <Modal isOpen={isOpen} onClose={onClose}>
-                    <ModalOverlay />
-                    <ModalContent>
-                      <ModalHeader>Popup Title</ModalHeader>
-                      <ModalCloseButton />
-                      <ModalBody>
-                        
-                        <p>This is the content of the popup.</p>
-                      </ModalBody>
-                      <ModalFooter>
-                        <Button colorScheme="blue" mr={3} onClick={onClose}>
-                          Close
-                        </Button>
-                        {/* Additional buttons or actions */}
-                      </ModalFooter>
-                    </ModalContent>
-                  </Modal>
-                  <button style={{ marginLeft: "10px" }}>History</button>
+                  <div className={style.flexbutton}>
+                    <div>
+                      <button onClick={() => onOpen(el)}>
+                        {user?.role == "student" ? "Ask Doubt" : "Check Doubt"}
+                      </button>
+                      <DoubtModel isOpen={isOpen} onClose={onClose}  setSendMessage={setSendMessage} receiveMessage={receiveMessage}/>
+                    </div>
+                    <div>
+                      <button>Chat History</button>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}

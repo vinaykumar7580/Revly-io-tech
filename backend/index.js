@@ -40,10 +40,31 @@ io.on("connection", (socket) => {
 
     });
 
+    //send notification and receive
     socket.on("send-notification", (subject)=>{
-
+        console.log("notify", subject)
         io.emit("recieve-notification", subject);
     })
+
+    //send message and receive
+
+    socket.on("send-message", (data)=>{
+        
+        console.log("newuserid",data)
+        io.emit("receive-message", data)
+        
+
+    })
+
+    //disconnect
+    socket.on("disconnect", () => {
+        // remove user from active users
+       const removeusers = users.filter((user) => user.socketId !== socket.id);
+        console.log("User Disconnected", removeusers);
+
+        // send all active users to all users
+        io.emit("get-users", removeusers);
+      });
 
     
 
