@@ -38,7 +38,7 @@ function Register() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    fetch("http://localhost:8080/auth/register",{
+    fetch("https://revly-backend.onrender.com/auth/register",{
       method:"POST",
       body:JSON.stringify(formData),
       headers:{

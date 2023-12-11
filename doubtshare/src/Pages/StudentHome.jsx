@@ -15,7 +15,7 @@ function StudentHome() {
   const [allUser, setAllUser]=useState([])
 
   const socket = useRef();
-  socket.current = io("http://localhost:8080");
+  socket.current = io("https://revly-backend.onrender.com");
 
   const onOpen = (sub) => {
     setIsOpen(true);
@@ -42,7 +42,7 @@ function StudentHome() {
   
   const handleUser = () => {
     let id = localStorage.getItem("userId");
-    fetch(`http://localhost:8080/auth/user/${id}`, {
+    fetch(`https://revly-backend.onrender.com/auth/user/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

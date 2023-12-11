@@ -23,7 +23,7 @@ function Login() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    fetch("http://localhost:8080/auth/login",{
+    fetch("https://revly-backend.onrender.com/auth/login",{
       method:"POST",
       body:JSON.stringify(formData),
       headers:{
